@@ -11,7 +11,6 @@ import (
 func Demofunc(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	t := vars["type"]
-
 	if t == "" {
 		writeJsonResponse(w, http.StatusBadRequest, api.ErrorResponse{
 			Code:  http.StatusBadRequest,
