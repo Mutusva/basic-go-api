@@ -40,7 +40,7 @@ func (app *LocationApp) NowLocation(w http.ResponseWriter, r *http.Request) {
 func (app *LocationApp) GetLocation(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userId := vars["user_id"]
-	maxReq := vars["max"]
+	maxReq := r.URL.Query().Get("max")
 
 	max, err := strconv.Atoi(maxReq)
 	if err != nil {
@@ -49,7 +49,11 @@ func (app *LocationApp) GetLocation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	locs, err := app.DS.GetLocation(userId, max)
-	writeJsonResponse(w, http.StatusOK, locs)
+	response := models.LocationRequest{
+		UserId:  userId,
+		History: locs,
+	}
+	writeJsonResponse(w, http.StatusOK, response)
 	return
 }
 
