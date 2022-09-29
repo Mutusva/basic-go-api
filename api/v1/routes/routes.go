@@ -3,20 +3,25 @@ package routes
 import (
 	"github.com/gorilla/mux"
 	"go-api/api/v1/handlers"
+	"go-api/datastore"
 	"net/http"
 )
 
 func InitialiseRoutes() *mux.Router {
 	r := mux.NewRouter()
-	r.HandleFunc("/v1/demo/{type}", handlers.Demofunc).Methods("GET")
-	r.Use(AuthMiddleware)
+	app := handlers.LocationApp{
+		DS: datastore.NewInMemeryStore(),
+	}
+	r.HandleFunc("/location/{user_id}", app.GetLocation).Methods("GET")
+	r.HandleFunc("/location/{user_id}/now", app.NowLocation).Methods("POST")
+	r.HandleFunc("/location/{user_id}", app.Delete).Methods("DELETE")
+	r.Use(ContentTypeMiddleware)
 	return r
 }
 
-func AuthMiddleware(next http.Handler) http.Handler {
+func ContentTypeMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		r.SetBasicAuth("innoe", "p@ssword")
-
+		w.Header().Set("Content-Type", "application/json")
 		next.ServeHTTP(w, r)
 	})
 }
